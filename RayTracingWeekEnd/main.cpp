@@ -1,29 +1,24 @@
 #include <iostream>
 #include <fstream>
 
+#include "rtweekend.h"
+
+#include "HittableList.h"
+#include "Sphere.h"
 #include "Color.h"
-#include "Ray.h"
 
 
-bool hit_sphere(const Point3& center, double radius, const Ray& r)
+Color ray_color(const Ray& r, const Hittable& world)
 {
-	Vec3 oc = r.origin() - center;
-	auto a = dot(r.direction(), r.direction());
-	auto b = 2.0 * dot(r.direction(), oc);
-	auto c = dot(oc, oc) - radius * radius;
-	auto discriminant = b * b - 4.0 * a * c;
-	return discriminant >= 0;
-}
+	HitRecord rec{};
 
-Color ray_color(const Ray& r)
-{
-	if (hit_sphere(Point3(0, 0, -1), 0.5, r))
+	if (world.hit(r, 0, infinity, rec))
 	{
-		return Color(1.0, 0.0, 0.0);	// 赤い球
+		return rec.normal * 0.5 + Color(0.5, 0.5, 0.5);
 	}
 
 	Vec3 unit_direction = unit_vector(r.direction());
-	double t = 0.5 * (unit_direction.y() + 1.0);	// [-1,1] -> [0,1]に変換
+	auto t = 0.5 * (unit_direction.y() + 1.0);	// [-1,1] -> [0,1]に変換
 	return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);	// 青と白のグラデ
 }
 
@@ -47,6 +42,10 @@ int main()
 	auto vertical = Vec3(0, viewport_height, 0);
 	auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focal_length);	// 右手座標系のため、奥行方向がZ-
 
+	HittableList world{};
+	world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+	world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+
 	for (int j = image_height - 1; j >= 0; --j)
 	{
 		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -57,7 +56,7 @@ int main()
 			double v = double(j) / (image_height - 1);
 			Ray ray(origin, lower_left_corner + u * horizontal + v * vertical - origin);
 
-			Color pixel_color = ray_color(ray);
+			Color pixel_color = ray_color(ray, world);
 			write_color(file, pixel_color);
 		}
 	}
