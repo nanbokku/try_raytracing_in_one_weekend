@@ -48,12 +48,18 @@ int main()
 	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
 	constexpr int samples_per_pixel = 100;
 	constexpr int max_depth = 50;
+	const Point3 lookfrom{ 3,3,2 };
+	const Point3 lookat{ 0,0,-1 };
+	const Vec3 vup{ 0,1,0 };
+	const double dist_to_focus = (lookfrom - lookat).length();
+	constexpr double aperture = 2.0;
 
 	std::ofstream file("image.ppm");
 
 	file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-	Camera cam{ 90, double(image_width / image_height) };
+	Camera cam{ lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus };
+	double R = cos(pi / 4);
 
 	HittableList world{};
 	world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5, std::make_shared<Lambertian>(Color(0.1, 0.2, 0.5))));
