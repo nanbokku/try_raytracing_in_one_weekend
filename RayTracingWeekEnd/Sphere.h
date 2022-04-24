@@ -3,12 +3,14 @@
 #include "Hittable.h"
 #include "Vec3.h"
 
+class Material;
+
 class Sphere : public Hittable
 {
 public:
 	Sphere() = default;
-	Sphere(const Point3& cen, double r)
-		:center(cen), radius(r)
+	Sphere(const Point3& cen, double r, std::shared_ptr<Material> m)
+		:center(cen), radius(r), mat_ptr(m)
 	{
 	}
 
@@ -17,4 +19,5 @@ public:
 private:
 	Point3 center{ 0,0,0 };
 	double radius{ 0 };
+	std::shared_ptr<Material> mat_ptr;
 };

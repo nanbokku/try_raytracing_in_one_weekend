@@ -6,15 +6,33 @@
 #include "HittableList.h"
 #include "Sphere.h"
 #include "Color.h"
+#include "Camera.h"
+#include "Lambertian.h"
+#include "Metal.h"
+#include "Dielectric.h"
 
 
-Color ray_color(const Ray& r, const Hittable& world)
+Color ray_color(const Ray& r, const Hittable& world, int depth)
 {
 	HitRecord rec{};
 
-	if (world.hit(r, 0, infinity, rec))
+	// 反射回数が一定よりも多くなったら、その時点で追跡をやめる
+	if (depth <= 0)
 	{
-		return rec.normal * 0.5 + Color(0.5, 0.5, 0.5);
+		return Color(0, 0, 0);
+	}
+
+	if (world.hit(r, 0.001, infinity, rec))
+	{
+		Ray scattered;
+		Color attenuation;
+
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+		{
+			return attenuation * ray_color(scattered, world, depth - 1);
+		}
+
+		return Color(0, 0, 0);
 	}
 
 	Vec3 unit_direction = unit_vector(r.direction());
@@ -28,23 +46,21 @@ int main()
 	constexpr double aspect_ratio = 16.0 / 9.0;
 	constexpr int image_width = 256;
 	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+	constexpr int samples_per_pixel = 100;
+	constexpr int max_depth = 50;
 
 	std::ofstream file("image.ppm");
 
 	file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-	constexpr double viewport_height = 2.0;
-	constexpr double viewport_width = aspect_ratio * viewport_height;
-	constexpr double focal_length = 1.0;
-
-	auto origin = Point3(0, 0, 0);
-	auto horizontal = Vec3(viewport_width, 0, 0);
-	auto vertical = Vec3(0, viewport_height, 0);
-	auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focal_length);	// 右手座標系のため、奥行方向がZ-
+	Camera cam{ 90, double(image_width / image_height) };
 
 	HittableList world{};
-	world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-	world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+	world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5, std::make_shared<Lambertian>(Color(0.1, 0.2, 0.5))));
+	world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100, std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0))));
+	world.add(std::make_shared<Sphere>(Point3(1, 0, -1), 0.5, std::make_shared<Metal>(Color(.8, .6, .2), 0.3)));
+	world.add(std::make_shared<Sphere>(Point3(-1, 0, -1), 0.5, std::make_shared<Dielectric>(1.5)));
+	world.add(std::make_shared<Sphere>(Point3(-1, 0, -1), -0.45, std::make_shared<Dielectric>(1.5)));
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{
@@ -52,12 +68,18 @@ int main()
 
 		for (int i = 0; i < image_width; ++i)
 		{
-			double u = double(i) / (image_width - 1);
-			double v = double(j) / (image_height - 1);
-			Ray ray(origin, lower_left_corner + u * horizontal + v * vertical - origin);
+			Color pixel_color{ 0,0,0 };
 
-			Color pixel_color = ray_color(ray, world);
-			write_color(file, pixel_color);
+			for (int s = 0; s < samples_per_pixel; ++s)
+			{
+				double u = double(i + random_double()) / (image_width - 1);
+				double v = double(j + random_double()) / (image_height - 1);
+				Ray ray = cam.get_ray(u, v);
+
+				pixel_color += ray_color(ray, world, max_depth);
+			}
+
+			write_color(file, pixel_color, samples_per_pixel);
 		}
 	}
 
