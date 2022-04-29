@@ -31,6 +31,11 @@ inline double random_double()
 	return random_double(0.0, 1.0);
 }
 
+inline int random_int(int min, int max)
+{
+	return min + rand() % (max - min + 1);
+}
+
 inline double clamp(double x, double min, double max)
 {
 	if (x < min) return min;

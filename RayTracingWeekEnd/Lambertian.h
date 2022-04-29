@@ -2,10 +2,12 @@
 
 #include "Material.h"
 
+class Texture;
+
 class Lambertian : public Material
 {
 public:
-	Lambertian(const Color& a)
+	Lambertian(const std::shared_ptr<Texture>& a)
 		:albedo(a)
 	{
 	}
@@ -13,5 +15,5 @@ public:
 	virtual bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered) const;
 
 private:
-	Color albedo;
+	std::shared_ptr<Texture> albedo;
 };

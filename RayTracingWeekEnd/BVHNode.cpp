@@ -20,11 +20,6 @@ bool BVHNode::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) cons
 	return hit_left || hit_right;
 }
 
-inline int random_int(int min, int max)
-{
-	return min + rand() % (max - min + 1);
-}
-
 BVHNode::BVHNode(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end, double time0, double time1)
 {
 	int axis = random_int(0, 2);

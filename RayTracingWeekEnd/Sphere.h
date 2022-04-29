@@ -22,3 +22,11 @@ private:
 	double radius{ 0 };
 	std::shared_ptr<Material> mat_ptr;
 };
+
+inline void get_sphere_uv(const Vec3& p, double& u, double& v)
+{
+	auto phi = atan2(p.z(), p.x());	// -pi ~ pi
+	auto theta = asin(p.y());	// -pi/2 ~ pi/2
+	u = 1 - (phi + pi) / (2.0 * pi);	// ‚’¼ã•ûŒü‚ª³
+	v = (theta + pi / 2) / pi;
+}

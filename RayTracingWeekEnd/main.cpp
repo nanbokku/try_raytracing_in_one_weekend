@@ -11,6 +11,7 @@
 #include "Lambertian.h"
 #include "Metal.h"
 #include "Dielectric.h"
+#include "Texture.h"
 
 
 Color ray_color(const Ray& r, const Hittable& world, int depth)
@@ -45,7 +46,7 @@ HittableList random_scene()
 {
 	HittableList world{};
 
-	auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+	auto ground_material = std::make_shared<Lambertian>(std::make_shared<CheckerTexture>(std::make_shared<SolidColor>(Color(0.2, 0.3, 0.1)), std::make_shared<SolidColor>(Color(0.9, 0.9, 0.9))));
 	world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
 
 	for (int a = -11; a < 11; a++)
@@ -62,7 +63,7 @@ HittableList random_scene()
 				if (choose_mat < 0.8)
 				{
 					// diffuse
-					auto albedo = Color::random() * Color::random();
+					auto albedo = std::make_shared<SolidColor>(Color::random() * Color::random());
 					sphere_material = std::make_shared<Lambertian>(albedo);
 					auto center2 = center + Vec3(0, random_double(0, 0.5), 0);
 					world.add(std::make_shared<MovingSphere>(center, center2, 0, 1, 0.2, sphere_material));
@@ -87,12 +88,27 @@ HittableList random_scene()
 
 	auto material1 = std::make_shared<Dielectric>(1.5);
 	world.add(std::make_shared<Sphere>(Point3(0, 1, 0), 1, material1));
-	auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+	auto material2 = std::make_shared<Lambertian>(std::make_shared<SolidColor>(Color(0.4, 0.2, 0.1)));
 	world.add(std::make_shared<Sphere>(Point3(-4, 1, 0), 1, material2));
 	auto material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0);
 	world.add(std::make_shared<Sphere>(Point3(4, 1, 0), 1, material3));
 
 	return world;
+}
+
+HittableList two_spheres()
+{
+	HittableList objects{};
+
+	auto checker = std::make_shared<CheckerTexture>(
+		std::make_shared<SolidColor>(0.2, 0.3, 0.1),
+		std::make_shared<SolidColor>(0.9, 0.9, 0.9)
+	);
+
+	objects.add(std::make_shared<Sphere>(Point3(0, -10, 0), 10, std::make_shared<Lambertian>(checker)));
+	objects.add(std::make_shared<Sphere>(Point3(0, 10, 0), 10, std::make_shared<Lambertian>(checker)));
+
+	return objects;
 }
 
 int main(int argc, char* argv[])
@@ -115,7 +131,7 @@ int main(int argc, char* argv[])
 	Camera cam{ lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = random_scene();
+	HittableList world = two_spheres();
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{

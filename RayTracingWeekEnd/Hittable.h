@@ -10,6 +10,8 @@ struct HitRecord
 	Vec3 normal;
 	std::shared_ptr<Material> mat_ptr;
 	double t;
+	double u;	// テクスチャ座標U
+	double v;	// テクスチャ座標V
 	bool front_face;
 
 	inline void set_face_normal(const Ray& r, const Vec3& outward_normal)
