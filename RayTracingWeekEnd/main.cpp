@@ -123,6 +123,14 @@ HittableList two_perlin_spheres()
 	return objects;
 }
 
+HittableList earth()
+{
+	auto earth_texture = std::make_shared<ImageTexture>("world.jpg");
+	auto earth_surface = std::make_shared<Lambertian>(earth_texture);
+	auto globe = std::make_shared<Sphere>(Point3(0, 0, 0), 2, earth_surface);
+	return HittableList(globe);
+}
+
 int main(int argc, char* argv[])
 {
 	constexpr double aspect_ratio = 16.0 / 9.0;
@@ -143,7 +151,7 @@ int main(int argc, char* argv[])
 	Camera cam{ lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = two_perlin_spheres();
+	HittableList world = earth();
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{

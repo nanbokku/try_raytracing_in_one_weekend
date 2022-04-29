@@ -168,6 +168,7 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="rtweekend.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vec3.h" />
   </ItemGroup>

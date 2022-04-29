@@ -82,3 +82,28 @@ private:
 	Perlin noise{};
 	double scale{};
 };
+
+class ImageTexture : public Texture
+{
+public:
+	static constexpr int bytes_per_pixel = 3;
+
+	ImageTexture()
+		:data(nullptr), width(0), height(0), bytes_per_scanline(0)
+	{
+	}
+
+	ImageTexture(const char* filename);
+
+	~ImageTexture()
+	{
+		delete data;
+	}
+
+	virtual Color value(double u, double v, const Vec3& p) const;
+
+private:
+	unsigned char* data;
+	int width, height;
+	int bytes_per_scanline;
+};
