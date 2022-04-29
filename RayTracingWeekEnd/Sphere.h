@@ -15,6 +15,7 @@ public:
 	}
 
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const;
+	virtual bool bounding_box(double t0, double t1, AABB& output_box) const;
 
 private:
 	Point3 center{ 0,0,0 };

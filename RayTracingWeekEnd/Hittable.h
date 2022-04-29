@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ray.h"
+#include "AABB.h"
 
 class Material;
 
@@ -24,4 +24,5 @@ class Hittable
 public:
 	virtual ~Hittable() = default;
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const = 0;
+	virtual bool bounding_box(double t0, double t1, AABB& output_box) const = 0;
 };
