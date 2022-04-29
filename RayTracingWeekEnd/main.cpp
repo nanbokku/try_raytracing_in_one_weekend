@@ -5,6 +5,7 @@
 
 #include "HittableList.h"
 #include "Sphere.h"
+#include "MovingSphere.h"
 #include "Color.h"
 #include "Camera.h"
 #include "Lambertian.h"
@@ -63,7 +64,8 @@ HittableList random_scene()
 					// diffuse
 					auto albedo = Color::random() * Color::random();
 					sphere_material = std::make_shared<Lambertian>(albedo);
-					world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+					auto center2 = center + Vec3(0, random_double(0, 0.5), 0);
+					world.add(std::make_shared<MovingSphere>(center, center2, 0, 1, 0.2, sphere_material));
 				}
 				else if (choose_mat < 0.95)
 				{
@@ -93,7 +95,7 @@ HittableList random_scene()
 	return world;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	constexpr double aspect_ratio = 16.0 / 9.0;
 	constexpr int image_width = 256;
@@ -104,9 +106,9 @@ int main()
 	const Point3 lookat{ 0,0,0 };
 	const Vec3 vup{ 0,1,0 };
 	const double dist_to_focus = 10;
-	constexpr double aperture = 0.1;
+	constexpr double aperture = 0.0;
 
-	std::ofstream file("image.ppm");
+	std::ofstream file(std::string(argv[1]) + ".ppm");
 
 	file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
