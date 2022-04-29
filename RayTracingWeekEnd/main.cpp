@@ -111,6 +111,18 @@ HittableList two_spheres()
 	return objects;
 }
 
+HittableList two_perlin_spheres()
+{
+	HittableList objects{};
+
+	auto pertext = std::make_shared<NoiseTexture>(5);
+
+	objects.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+	objects.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+	return objects;
+}
+
 int main(int argc, char* argv[])
 {
 	constexpr double aspect_ratio = 16.0 / 9.0;
@@ -131,7 +143,7 @@ int main(int argc, char* argv[])
 	Camera cam{ lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = two_spheres();
+	HittableList world = two_perlin_spheres();
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{

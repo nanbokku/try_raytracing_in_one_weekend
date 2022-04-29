@@ -4,8 +4,6 @@
 #include <iostream>
 #include "rtweekend.h"
 
-using std::sqrt;
-
 class Vec3
 {
 public:
@@ -41,7 +39,7 @@ public:
 		return *this;
 	}
 
-	double length() const { return sqrt(length_squared()); }
+	double length() const { return std::sqrt(length_squared()); }
 	double length_squared() const
 	{
 		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
@@ -121,7 +119,7 @@ inline Vec3 random_unit_vector()
 {
 	auto theta = random_double(0, 2 * pi);	// Œo“x
 	auto y = random_double(-1, 1);	// ‚‚³
-	auto r = sqrt(1.0 - y * y);	// XZ•½–Ê‚ÅŒ©‚½‚Ì‰~‚Ì”¼Œa
+	auto r = std::sqrt(1.0 - y * y);	// XZ•½–Ê‚ÅŒ©‚½‚Ì‰~‚Ì”¼Œa
 
 	return Vec3(r * cos(theta), y, r * sin(theta));
 }
@@ -145,7 +143,7 @@ inline Vec3 refract(const Vec3& uv, const Vec3& n, double etai_over_etat)
 {
 	auto cos_theta = dot(-uv, n);
 	Vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
-	Vec3 r_out_perp = -sqrt(1 - r_out_parallel.length_squared()) * n;
+	Vec3 r_out_perp = -std::sqrt(1 - r_out_parallel.length_squared()) * n;
 	return r_out_parallel + r_out_perp;
 }
 inline Vec3 random_in_unit_disk()
