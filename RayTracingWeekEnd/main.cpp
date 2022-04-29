@@ -14,7 +14,7 @@
 #include "Texture.h"
 
 
-Color ray_color(const Ray& r, const Hittable& world, int depth)
+Color ray_color(const Ray& r, const Color& background, const Hittable& world, int depth)
 {
 	HitRecord rec{};
 
@@ -24,22 +24,24 @@ Color ray_color(const Ray& r, const Hittable& world, int depth)
 		return Color(0, 0, 0);
 	}
 
-	if (world.hit(r, 0.001, infinity, rec))
+	if (!world.hit(r, 0.001, infinity, rec))
 	{
-		Ray scattered;
-		Color attenuation;
-
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-		{
-			return attenuation * ray_color(scattered, world, depth - 1);
-		}
-
-		return Color(0, 0, 0);
+		// レイがどのオブジェクトとも交わらないなら背景色を返す
+		return background;
 	}
 
-	Vec3 unit_direction = unit_vector(r.direction());
-	auto t = 0.5 * (unit_direction.y() + 1.0);	// [-1,1] -> [0,1]に変換
-	return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);	// 青と白のグラデ
+	Ray scattered;
+	Color attenuation;
+	Color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+
+	if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+	{
+		// レイが反射しないとき
+		return emitted;
+	}
+
+
+	return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
 HittableList random_scene()
@@ -103,7 +105,7 @@ HittableList two_spheres()
 	auto checker = std::make_shared<CheckerTexture>(
 		std::make_shared<SolidColor>(0.2, 0.3, 0.1),
 		std::make_shared<SolidColor>(0.9, 0.9, 0.9)
-	);
+		);
 
 	objects.add(std::make_shared<Sphere>(Point3(0, -10, 0), 10, std::make_shared<Lambertian>(checker)));
 	objects.add(std::make_shared<Sphere>(Point3(0, 10, 0), 10, std::make_shared<Lambertian>(checker)));
@@ -143,6 +145,7 @@ int main(int argc, char* argv[])
 	const Vec3 vup{ 0,1,0 };
 	const double dist_to_focus = 10;
 	constexpr double aperture = 0.0;
+	const Color background_color{ 1,1,1 };
 
 	std::ofstream file(std::string(argv[1]) + ".ppm");
 
@@ -167,7 +170,7 @@ int main(int argc, char* argv[])
 				double v = double(j + random_double()) / (image_height - 1);
 				Ray ray = cam.get_ray(u, v);
 
-				pixel_color += ray_color(ray, world, max_depth);
+				pixel_color += ray_color(ray, background_color, world, max_depth);
 			}
 
 			write_color(file, pixel_color, samples_per_pixel);
