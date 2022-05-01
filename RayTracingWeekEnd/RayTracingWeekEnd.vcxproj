@@ -140,10 +140,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="BVHNode.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dielectric.cpp" />
     <ClCompile Include="DiffuseLight.cpp" />
+    <ClCompile Include="Hittable.cpp" />
     <ClCompile Include="HittableList.cpp" />
     <ClCompile Include="Lambertian.cpp" />
     <ClCompile Include="main.cpp" />
@@ -158,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="Box.h" />
     <ClInclude Include="BVHNode.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
