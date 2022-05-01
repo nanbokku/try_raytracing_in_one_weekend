@@ -12,6 +12,11 @@
 #include "Metal.h"
 #include "Dielectric.h"
 #include "Texture.h"
+#include "DiffuseLight.h"
+#include "XYRect.h"
+#include "YZRect.h"
+#include "XZRect.h"
+#include "BVHNode.h"
 
 
 Color ray_color(const Ray& r, const Color& background, const Hittable& world, int depth)
@@ -133,28 +138,64 @@ HittableList earth()
 	return HittableList(globe);
 }
 
+HittableList simple_light()
+{
+	HittableList objects{};
+
+	auto pertext = std::make_shared<NoiseTexture>(4);
+	objects.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, std::make_shared<Lambertian>(pertext)));
+	objects.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2, std::make_shared<Lambertian>(pertext)));
+
+	auto difflight = std::make_shared<DiffuseLight>(std::make_shared<SolidColor>(4, 4, 4));
+	objects.add(std::make_shared<Sphere>(Point3(0, 7, 0), 2, difflight));
+	objects.add(std::make_shared<XYRect>(3, 5, 1, 3, -2, difflight));
+
+	return objects;
+}
+
+HittableList cornell_box()
+{
+	HittableList objects{};
+
+	auto red = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.65, .05, .05));
+	auto white = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.73, .73, .73));
+	auto green = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.12, .45, .15));
+	auto light = std::make_shared<DiffuseLight>(std::make_shared<SolidColor>(1, 1, 1));
+
+	objects.add(std::make_shared<YZRect>(0, 555, 0, 555, 555, green));
+	objects.add(std::make_shared<YZRect>(0, 555, 0, 555, 0, red));
+	objects.add(std::make_shared<XZRect>(213, 343, 227, 332, 554, light));
+	objects.add(std::make_shared<XZRect>(0, 555, 0, 555, 555, white));
+	objects.add(std::make_shared<XZRect>(0, 555, 0, 555, 0, white));
+	objects.add(std::make_shared<XYRect>(0, 555, 0, 555, 555, white));
+
+	return objects;
+}
+
 int main(int argc, char* argv[])
 {
-	constexpr double aspect_ratio = 16.0 / 9.0;
-	constexpr int image_width = 256;
+	constexpr double aspect_ratio = 1.0;
+	constexpr int image_width = 500;
 	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
 	constexpr int samples_per_pixel = 100;
 	constexpr int max_depth = 50;
-	const Point3 lookfrom{ 13,2,3 };
-	const Point3 lookat{ 0,0,0 };
+	const Point3 lookfrom{ 278, 278, -800 };
+	const Point3 lookat{ 278,278,0 };
 	const Vec3 vup{ 0,1,0 };
 	const double dist_to_focus = 10;
 	constexpr double aperture = 0.0;
-	const Color background_color{ 1,1,1 };
+	constexpr double vfov = 40.0;
+	const Color background_color{ 0,0,0 };
 
-	std::ofstream file(std::string(argv[1]) + ".ppm");
+	//std::ofstream file(std::string(argv[1]) + ".ppm");
 
-	file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-	Camera cam{ lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus };
+	Camera cam{ lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = earth();
+	HittableList world = cornell_box();
+	auto bvh = BVHNode(world, 0.001, infinity);
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{
@@ -170,10 +211,10 @@ int main(int argc, char* argv[])
 				double v = double(j + random_double()) / (image_height - 1);
 				Ray ray = cam.get_ray(u, v);
 
-				pixel_color += ray_color(ray, background_color, world, max_depth);
+				pixel_color += ray_color(ray, background_color, bvh, max_depth);
 			}
 
-			write_color(file, pixel_color, samples_per_pixel);
+			write_color(std::cout, pixel_color, samples_per_pixel);
 		}
 	}
 

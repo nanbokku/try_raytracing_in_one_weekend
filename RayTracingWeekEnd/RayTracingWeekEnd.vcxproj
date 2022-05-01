@@ -152,6 +152,9 @@
     <ClCompile Include="Perlin.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="XYRect.cpp" />
+    <ClCompile Include="XZRect.cpp" />
+    <ClCompile Include="YZRect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
@@ -173,6 +176,9 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vec3.h" />
+    <ClInclude Include="XYRect.h" />
+    <ClInclude Include="XZRect.h" />
+    <ClInclude Include="YZRect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,6 +9,10 @@ public:
 		: emit(a)
 	{
 	}
+	DiffuseLight(const Color& c)
+		:emit(std::make_shared<SolidColor>(c))
+	{
+	}
 
 	virtual bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered) const
 	{

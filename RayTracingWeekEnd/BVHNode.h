@@ -34,17 +34,17 @@ inline bool box_compare(const std::shared_ptr<Hittable>& a, const std::shared_pt
 	return box_a.min()[axis] < box_b.min()[axis];
 }
 
-bool box_x_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
+inline bool box_x_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
 {
 	return box_compare(a, b, 0);
 }
 
-bool box_y_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
+inline bool box_y_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
 {
 	return box_compare(a, b, 1);
 }
 
-bool box_z_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
+inline bool box_z_compare(const std::shared_ptr<Hittable>& a, const std::shared_ptr<Hittable>& b)
 {
 	return box_compare(a, b, 2);
 }

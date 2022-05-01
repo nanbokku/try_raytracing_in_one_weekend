@@ -54,6 +54,15 @@
     <ClCompile Include="DiffuseLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XYRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XZRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YZRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vec3.h">
@@ -111,6 +120,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DiffuseLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XYRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XZRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="YZRect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
