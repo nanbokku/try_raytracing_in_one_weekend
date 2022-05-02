@@ -20,8 +20,10 @@ bool BVHNode::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) cons
 	return hit_left || hit_right;
 }
 
-BVHNode::BVHNode(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end, double time0, double time1)
+BVHNode::BVHNode(const std::vector<std::shared_ptr<Hittable>>& src_objects, size_t start, size_t end, double time0, double time1)
 {
+	auto objects = src_objects;
+
 	int axis = random_int(0, 2);
 	auto comparator = (axis == 0) ? box_x_compare
 		: (axis == 1) ? box_y_compare

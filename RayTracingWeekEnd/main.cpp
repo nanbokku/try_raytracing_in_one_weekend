@@ -214,16 +214,89 @@ HittableList cornell_smoke()
 	return objects;
 }
 
+HittableList final_scene()
+{
+	HittableList boxes1;
+
+	auto ground = std::make_shared<Lambertian>(std::make_shared<SolidColor>(0.48, 0.83, 0.53));
+
+	const int boxes_per_side = 20;
+	for (int i = 0; i < boxes_per_side; i++)
+	{
+		for (int j = 0; j < boxes_per_side; j++)
+		{
+			double w = 100;
+			double x0 = -1000 + i * w;
+			double z0 = -1000 + j * w;
+			double y0 = 0;
+			double x1 = x0 + w;
+			double y1 = random_double(0, 1);
+			y1 = y1 * 100 + 1;	// 引数を(1, 101)にすると重かったので自力で算出
+			double z1 = z0 + w;
+
+			boxes1.add(std::make_shared<Box>(Point3(x0, y0, z0), Point3(x1, y1, z1), ground));
+		}
+	}
+
+
+	HittableList objects{};
+
+	objects.add(std::make_shared<BVHNode>(boxes1, 0, 1));
+
+	auto light = std::make_shared<DiffuseLight>(std::make_shared<SolidColor>(7, 7, 7));
+	objects.add(std::make_shared<XZRect>(123, 423, 147, 412, 554, light));
+
+
+	auto center1 = Point3(400, 400, 200);
+	auto center2 = center1 + Vec3(30, 0, 0);
+	auto moving_sphere_material = std::make_shared<Lambertian>(std::make_shared<SolidColor>(0.7, 0.3, 0.1));
+	objects.add(std::make_shared<MovingSphere>(center1, center2, 0, 1, 50, moving_sphere_material));
+
+	objects.add(std::make_shared<Sphere>(Point3(260, 150, 45), 50, std::make_shared<Dielectric>(1.5)));
+	objects.add(std::make_shared<Sphere>(Point3(0, 150, 145), 50, std::make_shared<Metal>(Color(0.8, 0.8, 0.9), 10.0)));
+
+	// クリアコート
+	auto boundary = std::make_shared<Sphere>(Point3(360, 150, 45), 70, std::make_shared<Dielectric>(1.5));
+	objects.add(boundary);
+	objects.add(std::make_shared<ConstantMedium>(boundary, 0.2, std::make_shared<SolidColor>(0.2, 0.4, 0.9)));
+
+	// 全体を包むフォグ
+	boundary = std::make_shared<Sphere>(Point3(0, 0, 0), 5000, std::make_shared<Dielectric>(1.5));
+	objects.add(std::make_shared<ConstantMedium>(boundary, .0001, std::make_shared<SolidColor>(1, 1, 1)));
+
+	auto emat = std::make_shared<Lambertian>(std::make_shared<ImageTexture>("world.jpg"));
+	objects.add(std::make_shared<Sphere>(Point3(400, 200, 400), 100, emat));
+	auto pertext = std::make_shared<NoiseTexture>(0.1);
+	objects.add(std::make_shared<Sphere>(Point3(220, 280, 300), 80, std::make_shared<Lambertian>(pertext)));
+
+	HittableList boxes2;
+	auto white = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.73, .73, .73));
+	int ns = 1000;
+	for (int j = 0; j < ns; j++)
+	{
+		boxes2.add(std::make_shared<Sphere>(Point3::random(0, 165), 10, white));
+	}
+
+	objects.add(
+		std::make_shared<Translate>(
+			std::make_shared<RotateY>(
+				std::make_shared<BVHNode>(boxes2, 0, 1), 15),
+			Vec3(-100, 270, 395)
+			)
+	);
+
+	return objects;
+}
 
 int main(int argc, char* argv[])
 {
 	constexpr double aspect_ratio = 1.0;
-	constexpr int image_width = 500;
+	constexpr int image_width = 800;
 	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
 	constexpr int samples_per_pixel = 100;
 	constexpr int max_depth = 50;
-	const Point3 lookfrom{ 278, 278, -800 };
-	const Point3 lookat{ 278,278,0 };
+	const Point3 lookfrom{ 478, 278, -600 };
+	const Point3 lookat{ 278, 278, 0 };
 	const Vec3 vup{ 0,1,0 };
 	const double dist_to_focus = 10;
 	constexpr double aperture = 0.0;
@@ -237,8 +310,7 @@ int main(int argc, char* argv[])
 	Camera cam{ lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = cornell_smoke();
-	auto bvh = BVHNode(world, 0.001, infinity);
+	HittableList world = final_scene();
 
 	for (int j = image_height - 1; j >= 0; --j)
 	{
@@ -254,7 +326,7 @@ int main(int argc, char* argv[])
 				double v = double(j + random_double()) / (image_height - 1);
 				Ray ray = cam.get_ray(u, v);
 
-				pixel_color += ray_color(ray, background_color, bvh, max_depth);
+				pixel_color += ray_color(ray, background_color, world, max_depth);
 			}
 
 			write_color(std::cout, pixel_color, samples_per_pixel);

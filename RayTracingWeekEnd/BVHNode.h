@@ -10,7 +10,7 @@ public:
 		:BVHNode(list.objects(), 0, list.objects().size(), time0, time1)
 	{
 	}
-	BVHNode(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end, double time0, double time1);
+	BVHNode(const std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end, double time0, double time1);
 
 	virtual bool hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const;
 	virtual bool bounding_box(double t0, double t1, AABB& output_box) const;
