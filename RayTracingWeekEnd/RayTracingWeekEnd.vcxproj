@@ -143,6 +143,7 @@
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="BVHNode.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantMedium.cpp" />
     <ClCompile Include="Dielectric.cpp" />
     <ClCompile Include="DiffuseLight.cpp" />
     <ClCompile Include="Hittable.cpp" />
@@ -164,10 +165,12 @@
     <ClInclude Include="BVHNode.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="ConstantMedium.h" />
     <ClInclude Include="Dielectric.h" />
     <ClInclude Include="DiffuseLight.h" />
     <ClInclude Include="Hittable.h" />
     <ClInclude Include="HittableList.h" />
+    <ClInclude Include="Isotropic.h" />
     <ClInclude Include="Lambertian.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Metal.h" />

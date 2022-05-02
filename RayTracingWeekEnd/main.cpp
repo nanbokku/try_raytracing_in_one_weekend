@@ -18,6 +18,7 @@
 #include "XZRect.h"
 #include "BVHNode.h"
 #include "Box.h"
+#include "ConstantMedium.h"
 
 
 Color ray_color(const Ray& r, const Color& background, const Hittable& world, int depth)
@@ -183,6 +184,37 @@ HittableList cornell_box()
 	return objects;
 }
 
+HittableList cornell_smoke()
+{
+	HittableList objects{};
+
+	auto red = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.65, .05, .05));
+	auto white = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.73, .73, .73));
+	auto green = std::make_shared<Lambertian>(std::make_shared<SolidColor>(.12, .45, .15));
+	auto light = std::make_shared<DiffuseLight>(std::make_shared<SolidColor>(7, 7, 7));
+
+	objects.add(std::make_shared<YZRect>(0, 555, 0, 555, 555, green));
+	objects.add(std::make_shared<YZRect>(0, 555, 0, 555, 0, red));
+	objects.add(std::make_shared<XZRect>(113, 443, 127, 432, 554, light));
+	objects.add(std::make_shared<XZRect>(0, 555, 0, 555, 555, white));
+	objects.add(std::make_shared<XZRect>(0, 555, 0, 555, 0, white));
+	objects.add(std::make_shared<XYRect>(0, 555, 0, 555, 555, white));
+
+	std::shared_ptr<Hittable> box1 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 330, 165), white);
+	box1 = std::make_shared<RotateY>(box1, 15);
+	box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+
+	std::shared_ptr<Hittable> box2 = std::make_shared<Box>(Point3(0, 0, 0), Point3(165, 165, 165), white);
+	box2 = std::make_shared<RotateY>(box2, -18);
+	box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+
+	objects.add(std::make_shared<ConstantMedium>(box1, 0.01, std::make_shared<SolidColor>(0, 0, 0)));
+	objects.add(std::make_shared<ConstantMedium>(box2, 0.01, std::make_shared<SolidColor>(1, 1, 1)));
+
+	return objects;
+}
+
+
 int main(int argc, char* argv[])
 {
 	constexpr double aspect_ratio = 1.0;
@@ -205,7 +237,7 @@ int main(int argc, char* argv[])
 	Camera cam{ lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus };
 	double R = cos(pi / 4);
 
-	HittableList world = cornell_box();
+	HittableList world = cornell_smoke();
 	auto bvh = BVHNode(world, 0.001, infinity);
 
 	for (int j = image_height - 1; j >= 0; --j)
