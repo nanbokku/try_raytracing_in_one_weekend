@@ -20,8 +20,8 @@ inline double degrees_to_radians(double degrees)
 inline double random_double(double min, double max)
 {
 	static std::random_device rd;
-	static std::uniform_real_distribution<double> distribution(min, max);
 	static std::mt19937 generator(rd());
+	std::uniform_real_distribution<double> distribution(min, max);
 
 	return distribution(generator);
 }

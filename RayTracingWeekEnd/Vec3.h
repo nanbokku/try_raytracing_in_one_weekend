@@ -122,7 +122,6 @@ inline Vec3 random_in_unit_sphere()
 }
 inline Vec3 random_unit_vector()
 {
-	return unit_vector(random_in_unit_sphere());
 	auto theta = random_double(0, 2 * pi);	// Œo“x
 	auto y = random_double(-1, 1);	// ‚‚³
 	auto r = std::sqrt(1.0 - y * y);	// XZ•½–Ê‚ÅŒ©‚½‚Ì‰~‚Ì”¼Œa

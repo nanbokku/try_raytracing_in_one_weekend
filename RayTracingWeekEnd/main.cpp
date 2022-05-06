@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
 	constexpr double aspect_ratio = 1.0;
 	constexpr int image_width = 800;
 	constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-	constexpr int samples_per_pixel = 100;
+	constexpr int samples_per_pixel = 10000;
 	constexpr int max_depth = 50;
 	const Point3 lookfrom{ 478, 278, -600 };
 	const Point3 lookat{ 278, 278, 0 };
@@ -301,7 +301,7 @@ int main(int argc, char* argv[])
 	const double dist_to_focus = 10;
 	constexpr double aperture = 0.0;
 	constexpr double vfov = 40.0;
-	const Color background_color{ 0,0,0 };
+	const Color background_color{ 0, 0 ,0 };
 
 	//std::ofstream file(std::string(argv[1]) + ".ppm");
 
